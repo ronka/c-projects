@@ -3,12 +3,20 @@
 int howManyBits();
 void printBin(unsigned long int);
 
-int main() {
-    int num, cnt;
-    printf("\n Enter Number: ");
-    scanf("%d", &num);
+unsigned short my_rotate(unsigned short, char);
 
-    printBin(num);
+int main() {
+    unsigned short a;
+    char offset;
+    printf("\n Enter Number and offset: ");
+    scanf("%h%c", &a, &offset);
+
+    printf("%d,%d)", a, offset);
+    // printBin(num);
+}
+
+unsigned short my_rotate(unsigned short a, char offset){
+    return 4;
 }
 
 void printBin(unsigned long int x){
