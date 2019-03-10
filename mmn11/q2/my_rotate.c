@@ -7,27 +7,20 @@ unsigned short my_rotate(unsigned short, char);
 
 int main() {
     unsigned short a;
-    char b;
+    int b;
 
     printf("\n Enter number: ");
     scanf("%hu", &a);
 
     printf("\n How much to rotate: ");
-    scanf(" %c",&b);
+    scanf("%d",&b);
 
-
-    printf("(%d,%c)\n", a, b);
-
-    printBin(b - '0');
-    printf("\n");
+    printf("\n Before: ");  
     printBin(a);
-    printf("\n");
-    printf("\n");
+    printf("\n After:  ");
 
-    printBin(my_rotate(a,b));
+    printBin( my_rotate( a, (char)b ) );
     printf("\n");
-
-    /* printBin(num); */
 
     return 0;
 }
@@ -36,7 +29,7 @@ unsigned short my_rotate(unsigned short a, char b){
     unsigned int maskLeft = 1 << ( howManyBits() - 1 ); /* 10...0 */
     unsigned int maskRight = 1; /* 0...01 */
 
-    int offset = b - '0';
+    int offset = (int)b;
     int temp;
 
     while ( offset ) {
@@ -61,10 +54,6 @@ unsigned short my_rotate(unsigned short a, char b){
                 a ^= maskLeft;
             }
         }
-
-        
-
-        printf("\n %d \n",temp);
     }
     
     return a;
