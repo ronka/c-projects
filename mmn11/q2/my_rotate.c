@@ -36,8 +36,6 @@ unsigned short my_rotate(unsigned short a, char b){
     unsigned int maskLeft = 1 << ( howManyBits() - 1 ); /* 10...0 */
     unsigned int maskRight = 1; /* 0...01 */
 
-    unsigned int mask;
-
     int offset = b - '0';
     int temp;
 
