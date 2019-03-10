@@ -9,6 +9,8 @@ int main() {
     scanf("%d", &num);
     cnt = countOddBits(num);
     printf("\n Bits ON in odd places: %d \n", cnt);
+
+    return 0;
 }
 
 int countOddBits(unsigned long int num){
