@@ -1,35 +1,38 @@
 #include <stdio.h>
 
-int howManyBits();
-void printBin(unsigned short int);
+int how_many_bits();
+void print_short_bin(unsigned short int);
 
 unsigned short my_rotate(unsigned short, char);
 
 int main() {
-    unsigned short a;
-    int b;
+    unsigned short a, result;
+    char b;
 
     printf("\n Enter number: ");
     scanf("%hu", &a);
 
     printf("\n How much to rotate: ");
-    scanf("%d",&b);
+    scanf("%hhd",&b);
 
-    printf("\n Before: ");  
-    printBin(a);
+    result = my_rotate( a, b );
+
+    printf("\n result: %d\n", result);
+
+    printf("\n Before: ");
+    print_short_bin(a);
     printf("\n After:  ");
-
-    printBin( my_rotate( a, (char)b ) );
-    printf("\n");
+    print_short_bin( result );
+    printf("\n\n");
 
     return 0;
 }
 
 unsigned short my_rotate(unsigned short a, char b){
-    unsigned int maskLeft = 1 << ( howManyBits() - 1 ); /* 10...0 */
+    unsigned int maskLeft = 1 << ( how_many_bits() - 1 ); /* 10...0 */
     unsigned int maskRight = 1; /* 0...01 */
 
-    int offset = (int)b;
+    int offset = b;
     int temp;
 
     while ( offset ) {
@@ -45,7 +48,6 @@ unsigned short my_rotate(unsigned short a, char b){
                 a ^= maskRight;
             }
         } else{
-            /* get the right most bit */
             temp = ( (a&maskRight) == 0 ) ? 0 : 1;
             a >>= 1;
             offset++;
@@ -59,18 +61,20 @@ unsigned short my_rotate(unsigned short a, char b){
     return a;
 }
 
-void printBin(unsigned short int x){
-    unsigned int mask = 1 << ( howManyBits() - 1 );
+void print_short_bin(unsigned short int x){
+    unsigned int mask = 1 << ( how_many_bits() - 1 );
 
     while( mask ){
-        if( (x&mask) == 0)
+        if( (x&mask) == 0){
             printf("0");
-        else
+        } else{
             printf("1");
+        }
         mask >>= 1;
     }
 }
 
-int howManyBits(){
+/* calculate number of bits */
+int how_many_bits(){
     return sizeof(unsigned short int)*8;
 }
