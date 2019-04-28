@@ -17,7 +17,7 @@ void sub_mat(void);
 void mul_mat(void);
 void mul_scalar(void);
 void trans_mat(void);
-int stop();
+void stop(void);
 void error(void);
 
 typedef struct {

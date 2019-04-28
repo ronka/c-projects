@@ -9,8 +9,9 @@ int main(){
     printf("read_mat,print_mat,add_mat,sub_mat,mul_mat,mul_scalar,trans_mat,stop \n");
 
     while ( state ){
-        printf("\n\nEnter a function: \n");
+        printf("\n\n Enter a function: \n");
         scanf("%s", command);
+        stop();
         state = FALSE;
         printf("\n %s", &command);
     }
