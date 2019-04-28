@@ -10,29 +10,18 @@ mat MAT_A, MAT_B, MAT_C, MAT_D, MAT_E, MAT_F;
 
 enum flag { FALSE, TRUE };
 
-void read_mat(void);
-void print_mat(void);
-void add_mat(void);
-void sub_mat(void);
-void mul_mat(void);
-void mul_scalar(void);
-void trans_mat(void);
-void stop(void);
-void error(void);
+void read_mat();
+void print_mat();
+void add_mat();
+void sub_mat();
+void mul_mat();
+void mul_scalar();
+void trans_mat();
+
+int stop();
+void error();
 
 typedef struct {
     char *name;
-    void (*func)(void);
+    void (*func)();
 } mat_cmd;
-
-mat_cmd cmd[] = {
-    {"read_mat", read_mat},
-    {"print_mat", print_mat},
-    {"add_mat", add_mat},
-    {"sub_mat", sub_mat},
-    {"mul_mat", mul_mat},
-    {"mul_scalar", mul_scalar},
-    {"trans_mat", trans_mat},
-    {"stop", stop},
-    {"error", error}
-};

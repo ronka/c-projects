@@ -1,3 +1,4 @@
+#include "mat.h"
 
 void read_mat(){
     printf("read_mat");
@@ -20,8 +21,9 @@ void mul_scalar(){
 void trans_mat(){
     printf("trans_mat");
 }
-void stop(){
+int stop(){
     printf("stop");
+    return FALSE;
 }
 void error(){
     printf("error");
