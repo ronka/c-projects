@@ -1,8 +1,18 @@
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #define SIZE 4
 #define LENGTH 100
+
+#define RED   "\x1B[31m"
+#define GRN   "\x1B[32m"
+#define YEL   "\x1B[33m"
+#define BLU   "\x1B[34m"
+#define MAG   "\x1B[35m"
+#define CYN   "\x1B[36m"
+#define WHT   "\x1B[37m"
+#define RESET "\x1B[0m"
 
 typedef double mat[SIZE][SIZE];
 
@@ -18,10 +28,16 @@ void mul_mat();
 void mul_scalar();
 void trans_mat();
 
-int stop();
-void error();
+void error(char[]);
+char *clean_spaces(char *);
+int is_mat(char[]);
 
 typedef struct {
     char *name;
     void (*func)();
-} mat_cmd;
+} cmd_list;
+
+typedef struct {
+    char *name;
+    mat *address;    
+} mat_list;
