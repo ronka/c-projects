@@ -4,7 +4,7 @@ int main(){
     int size, i;
     ptr head = NULL, tail = NULL;
 
-    printf("\n Enter the size of the Fibonacci sequence you want to build: ");
+    printf("\n Enter the size of the Fibbonaci series you want to build: ");
     scanf("%d", &size);
 
     for ( i=0 ; i < size ; i++ ){
@@ -26,10 +26,10 @@ int main(){
 void printlist( ptr head, ptr tail ){
     ptr p1 = head;
 
-    printf("\n The Fibonacci Sequence: \n");
+    printf("\n Printing a Fibbonaci series: \n");
 
     while ( p1 != NULL && p1 != tail ){
-        printf(" %d ->", p1->data );
+        printf(" %d -> ", p1->data );
         p1 = p1->next;
     }
 
@@ -58,10 +58,10 @@ void add2list( ptr * hptr, ptr * tptr, int data ){
 
     p1 = *hptr;
     p2 = *tptr;
-    *hptr = t;
-    t->next = p1;
     
-    p2->next = *hptr;
+    *hptr = t; /* set head of list to the new node */
+    t->next = p1; /* set next of head to the old head */
+    p2->next = *hptr; /* set tail of the list to point to the new head */
 
     return;
 }
