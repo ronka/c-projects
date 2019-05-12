@@ -6,7 +6,7 @@ int main(){
     ptr head = NULL, tail = NULL;
 
     printf("\n Enter the size of the Fibbonaci series you want to build: ");
-    if(scanf("%d%c", &size, &term) != 2 || term != '\n'){
+    if(scanf("%d%c", &size, &term) != 2 || term != '\n' || size <= 0){
         printf(" Invalid input\n");
         exit(0);
     }
