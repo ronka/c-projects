@@ -2,10 +2,14 @@
 
 int main(){
     int size, i;
+    char term;
     ptr head = NULL, tail = NULL;
 
     printf("\n Enter the size of the Fibbonaci series you want to build: ");
-    scanf("%d", &size);
+    if(scanf("%d%c", &size, &term) != 2 || term != '\n'){
+        printf(" Invalid input\n");
+        exit(0);
+    }
 
     for ( i=0 ; i < size ; i++ ){
         if ( i <= 1 ){
@@ -58,7 +62,7 @@ void add2list( ptr * hptr, ptr * tptr, int data ){
 
     p1 = *hptr;
     p2 = *tptr;
-    
+
     *hptr = t; /* set head of list to the new node */
     t->next = p1; /* set next of head to the old head */
     p2->next = *hptr; /* set tail of the list to point to the new head */
