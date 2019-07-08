@@ -11,4 +11,5 @@ sub r1,r4
 stop
 .entry STR
 K: .data 2 , 7
+r1: test
 ; test
