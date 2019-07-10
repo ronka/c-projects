@@ -8,3 +8,6 @@
 Bool firstRun(FILE *);
 Bool isLabel(char *);
 Bool isRegister(char*);
+Bool isValidMacro(char *);
+int isInstruction(char *, Instruction *);
+int isOp(char *);

@@ -1,16 +1,19 @@
 #include "fib_list.h"
 
 int main(){
-    int size, i;
+    int size, i, temp;
     char term;
     ptr head = NULL, tail = NULL;
 
     printf("\n Enter the size of the Fibbonaci series you want to build: ");
-    if(scanf("%d%c", &size, &term) != 2 || term != '\n' || size <= 0){
-        printf(" Invalid input\n");
-        exit(0);
+    temp = scanf("%d%c", &size, &term);
+    if( temp != 1 ){
+        if( temp != 2 || term != '\n' || size <= 0){
+            printf(" Invalid input\n");
+            exit(0);
+        }
     }
-
+    
     for ( i=0 ; i < size ; i++ ){
         if ( i <= 1 ){
             add2list( &head, &tail, 1 );
