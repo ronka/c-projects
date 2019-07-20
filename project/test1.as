@@ -1,5 +1,8 @@
 ;
+.define     len    =   4
 .entry   LOOP
+.define ssss = 33
+.define aaaa = 1111
 MAIN:      inc K
     mov *,W
     .extern    W
@@ -11,5 +14,3 @@ STR: .string "ab d"
     stop
 .entry STR
 K:     .data 2 , 7
-r1:   test
-; test

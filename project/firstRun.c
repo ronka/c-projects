@@ -1,11 +1,13 @@
 #include "assembler.h"
 
 Bool firstRun(FILE *sourceFile){
-    char line[MAX_LINE], temp_line[MAX_LINE];
+    char line[MAX_LINE], tempStr[MAX_LINE];
     char *token;
-    int op, instr;
-    int cnt_lines = 0;
-    Bool isStop = FALSE;
+    int op, instr; /* var used to save operation and instraction */
+    int cnt_lines = 0; /* current line */
+    Bool isStop = FALSE; /* checkstop flag */
+
+    DTptr DataTable = NULL; /* data table */
 
     Instruction instructions[] = {
         {".data", NULL},
@@ -17,7 +19,7 @@ Bool firstRun(FILE *sourceFile){
     while (fgets(line, MAX_LINE, sourceFile)) {
         printf("---------------------------\nLINE: %d \n", cnt_lines);
 
-        strncpy ( temp_line, line, MAX_LINE );
+        strncpy ( tempStr, line, MAX_LINE );
         
         /* clean white spaces 
         while( isspace(line) ){
@@ -30,11 +32,28 @@ Bool firstRun(FILE *sourceFile){
             continue;
         }
 
-        token = strtok(temp_line," ");
+        token = strtok(tempStr," ");
 
-        if( isValidMacro( token ) ){
-            /* TODO: HANDLE MACRO HERE */
-            printf("- macro: %s\n",token); /* DELETE */
+        if( isMacro( token ) ){
+            token = strtok(NULL, " ");
+
+            if( isRegister( token ) ){
+                printf("%s is not a valid label name!!!\n", token); /* DELETE */
+                return FALSE;
+            }
+            
+            /* TODO: HANDLE INVALID MACRO */
+
+            strcpy( tempStr, token );
+
+            /*removeSpaces(&token); */
+
+            token = strtok(NULL, "= "); /* TODO: FIX THIS */
+
+            if( ! DTaddData( &DataTable, tempStr, atoi(token) ) ){
+                printf("ERROR adding data table node"); /* DELETE */
+                return FALSE;
+            }
         }
 
         if( isLabel( token ) ){
@@ -87,6 +106,9 @@ Bool firstRun(FILE *sourceFile){
         cnt_lines++;
         printf("---------------------------\n\n");
     }
+
+    printf("DATATABLE:\n");
+    printDT( DataTable );
 
     return TRUE;
 }

@@ -38,7 +38,7 @@ int isOp( char* str ){
     return -1;
 }
 
-Bool isValidMacro( char *str ){
+Bool isMacro( char *str ){
    if( !strcmp( str, MACRO ) ){
         return TRUE;
     }
@@ -58,9 +58,19 @@ int isInstruction( char *str, Instruction insts[] ){
     return -1;
 }
 
+void removeSpaces(char* s) {
+    const char* d = s;
+    do {
+        while (*d == ' ') {
+            ++d;
+        }
+    } while (*(s++) = *(d++));
+}
+
 /**
  * Check if its a register name
  */
+
 Bool isRegister( char *reg ) {
 	return ( (reg[0] == 'r'
         && reg[1] >= '0'
