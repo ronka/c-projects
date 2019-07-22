@@ -60,11 +60,13 @@ int isInstruction( char *str, Instruction insts[] ){
 
 void removeSpaces(char* s) {
     const char* d = s;
+    printf("removing spaces: ");
     do {
+        printf("%s",*d);
         while (*d == ' ') {
             ++d;
         }
-    } while (*(s++) = *(d++));
+    } while (*s++ = *d++);
 }
 
 /**

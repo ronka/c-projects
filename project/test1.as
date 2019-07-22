@@ -1,6 +1,6 @@
 ;
 .define     len    =   4
-.entry   LOOP
+;.entry   LOOP
 .define ssss = 33
 .define aaaa = 1111
 MAIN:      inc K
@@ -9,7 +9,8 @@ MAIN:      inc K
     add    r2,STR
 LOOP: jmp W
     prn    #3
-STR: .string "ab d"
+TEST: .data 1
+STR: .string "abd"
     sub r1,    r4
     stop
 .entry STR

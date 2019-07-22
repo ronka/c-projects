@@ -6,14 +6,15 @@
 #include "consts.h"
 #include "datatable.h"
 
-Bool firstRun(FILE *);
+Bool firstRun(FILE *, DTptr *, DTptr *, DTptr *);
 Bool isLabel(char *);
 Bool isRegister(char*);
 Bool isMacro(char *);
 
 void removeSpaces(char*);
 
-Bool DTaddData(DTptr *, char*, int);
+Bool DTaddData(DTptr *, char*, char*, int);
+void printDT( DTptr );
 
 int isInstruction(char *, Instruction *);
 int isOp(char *);

@@ -43,7 +43,7 @@ typedef char* Opcode;
 
 typedef struct {
     char *name;
-    void (*func)();
+    int num;
 } Instruction;
 
 #endif

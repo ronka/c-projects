@@ -5,6 +5,7 @@ int main(int argc, char *argv[]) {
     char *currentFileName;
     Bool status;
     FILE *sourceFile;
+    DTptr DataTable = NULL, extFile = NULL, entFile = NULL; /* data table */
 
     if (argc == 1) {
         printf("Error, no input arguments.\n");
@@ -24,7 +25,7 @@ int main(int argc, char *argv[]) {
             continue;
         }
 
-        status = firstRun(sourceFile);
+        status = firstRun(sourceFile, &DataTable, &extFile, &entFile);
 
         /* if first run on the file failed */
         if( ! status ){
