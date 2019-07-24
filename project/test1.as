@@ -5,13 +5,13 @@
 .define aaaa = 1111
 MAIN:      inc K
     mov *,W
-    .extern    W
+    .extern    Ww
     add    r2,STR
 LOOP: jmp W
     prn    #3
-TEST: .data 1
+    TEST2: .data 3
+TEST: .data 2,5,3,2
 STR: .string "abd"
     sub r1,    r4
-    stop
 .entry STR
 K:     .data 2 , 7

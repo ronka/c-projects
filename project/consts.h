@@ -14,7 +14,10 @@
 #define OBJECT_FILE_NAME ".ob"
 
 #define MACRO ".define"
+#define CODE ".code"
 #define STOP "stop"
+#define DATA ".data"
+#define STRING ".string"
 
 typedef enum {
 	FALSE, TRUE
