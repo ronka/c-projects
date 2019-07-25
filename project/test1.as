@@ -1,7 +1,7 @@
 ;
 .define     len    =   4
 ;.entry   LOOP
-.define ssss = 33
+.define ssss=33
 .define aaaa = 1111
 MAIN:      inc K
     mov *,W

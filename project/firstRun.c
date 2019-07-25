@@ -9,7 +9,7 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
     int op, instr; /* var used to save operation and instraction */
     int cnt_lines = 0; /* current line */
     int DC = 0, IC = 0;
-    Bool labelFlag = FALSE;
+    Bool labelFlag;
     Bool isStop = FALSE; /* checkstop flag */
 
     Instruction instructions[] = {
@@ -20,15 +20,14 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
     };
 
     while (fgets(line, MAX_LINE, sourceFile)) {
+        labelFlag = FALSE;
         printf("---------------------------\nLINE: %d \n", cnt_lines);
 
         strncpy ( tempStr, line, MAX_LINE );
-    
-        /* clean white spaces 
-        while( isspace(line) ){
-            line++;
-        } */
         
+        /*
+         * If comment
+         * */
         if( *line == ';' || strlen(line) == 0 ){
             printf("- comment\n"); /* DELETE */
             cnt_lines++;
@@ -38,10 +37,11 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
         token = strtok(tempStr," ");
 
         if( isMacro( token ) ){
-            token = strtok(NULL, " = ");
+            
+            token = strtok(NULL, "=");
 
             /* TODO: FIX THIS */
-            /*removeSpaces(token);*/
+            removeSpaces(token);
 
             if( isRegister( token ) ){
                 printf("%s is not a valid label name!!!\n", token); /* DELETE */
@@ -52,7 +52,9 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
 
             strcpy( tempStr, token );
 
-            token = strtok(NULL, " "); /* TODO: FIX THIS */
+            token = strtok(NULL, " ");
+
+            token[strlen(token)-1]=0;
 
             if( isInST(*SymbolTable, tempStr, MACRO) ){
                 printf("This macro allready exists"); /* DELETE */
@@ -63,6 +65,8 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
                 printf("ERROR adding data table node"); /* DELETE */
                 return FALSE;
             }
+
+            continue;
         }
 
         if( isLabel( token ) ){
@@ -86,6 +90,8 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
             strcpy(tempStr, token);
 
             token = strtok(NULL," ");
+
+            labelFlag = TRUE;
         } else{
             labelFlag = FALSE; /* our flag if there is label */
         }
@@ -96,7 +102,7 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
             switch (instr)
             {
             case 0: /* .data */
-                if( labelFlag ){
+                if( ! labelFlag ){
                     continue;
                 }
                 
@@ -116,6 +122,7 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
                     DC++;
                     token = strtok(NULL,",");
                 } while(token != '\0');
+
                 continue;
             case 1: /* .string */
                 token = strtok(NULL," ");
@@ -124,6 +131,7 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
                     printf("Failed to save symbol"); /* DELETE */
                     return FALSE;
                 }
+
                 continue;
             case 2: /* extern */
                 token = strtok(NULL," ");
@@ -155,12 +163,19 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
         }
 
         if( (op = isOp( token )) > -1 ){
-            if( instr > -1 ){
-                printf("ERROR: CANT HAVE OP AFTER INSTRUCTION");
-                return FALSE;
+            if( labelFlag ){
+                if( ! STaddNode( SymbolTable, tempStr, CODE, DC ) ){
+                    printf("failed to add to symbol table\n"); /* DELETE */
+                    return FALSE;
+                } else{
+
+                }
             }
             printf("- op: `%s`, number: %d\n", token, op); /* DELETE */
             token = strtok(NULL," ");
+        } else {
+            printf("not recognized op: %s", token);
+            return FALSE;
         }
 
         /* TODO: CHECKSTOP */
