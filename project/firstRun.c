@@ -5,10 +5,9 @@ int getMemoryUsageOfOp( char *, STptr *, char *);
 Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFile){
     char line[MAX_LINE], tempStr[MAX_LINE];
     char *token;
-    int op, instr; /* var used to save operation and instraction */
+    int op, inst; /* var used to save operation and instraction */
     int DC = 0, IC = 0; /* memory track */
     Bool labelFlag, regFlag;
-
 
     DC = DC + MEMORY_START;
 
@@ -83,10 +82,10 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
             labelFlag = FALSE; /* our flag if there is label */
         }
 
-        if( (instr = isInstruction( token )) > -1 ){
-            switch (instr)
+        if( (inst = isInstruction( token )) > -1 ){
+            switch (inst)
             {
-            case 0: /* .data */
+            case INST_DATA: /* .data */
                 if( ! labelFlag ){
                     /* if there is no label, no need to save the data */
                     continue;
@@ -110,7 +109,7 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
                 } while(token != '\0');
 
                 continue;
-            case 1: /* .string */
+            case INST_STRING: /* .string */
                 if( ! labelFlag ){
                     /* if there is no label, no need to save the data */
                     continue;
@@ -139,7 +138,7 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
                 } while(token[0] != '"');
 
                 continue;
-            case 2: /* extern */
+            case INST_EXTERN: /* extern */
                 token = strtok(NULL," ");
 
                 removeSpaces(token);
@@ -149,7 +148,7 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
                     return FALSE;
                 }
                 continue;
-            case 3: /* entry */
+            case INST_ENTERY: /* entry */
                 token = strtok(NULL," ");
 
                 removeSpaces(token);
@@ -256,6 +255,7 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
 }
 
 int getMemoryUsageOfOp( char * token, STptr * SymbolTable, char * tempStr ){
+    /* DELETE */
     /* if( isMacro(token) ){
         return 1;
     } else if( token[0] == '#' ){

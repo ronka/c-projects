@@ -119,3 +119,16 @@ void printDT( DTptr head ){
     }
 
 }
+
+void updateDT( DTptr * head, char * symbol, int value ){
+    DTptr p1;
+    p1 = *head;
+
+    while( p1 != NULL ){
+        if( strcmp(p1->name, symbol) == 0 ){
+            p1->value = value;
+            break;
+        }
+        p1 = p1->next;
+    }
+}

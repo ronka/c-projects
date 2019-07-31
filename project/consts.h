@@ -24,6 +24,10 @@ typedef enum {
 	FALSE, TRUE
 } Bool;
 
+enum instructionMap {
+    INST_DATA, INST_STRING, INST_EXTERN, INST_ENTERY
+};
+
 /* Opcodes enum table */
 typedef enum {
     mov,

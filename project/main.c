@@ -28,9 +28,18 @@ int main(int argc, char *argv[]) {
 
         status = firstRun(sourceFile, &SymbolTable, &extFile, &entFile);
 
+        rewind(sourceFile);
+
         /* if first run on the file failed */
         if( ! status ){
             printf("Unable to parse %s.\n", currentFileName);
+            continue;
+        }
+
+        status = secondRun(sourceFile, &SymbolTable, &extFile, &entFile);
+
+        if( ! status ){
+            printf("Failed parsing the file %s.\n", currentFileName);
             continue;
         }
     }
