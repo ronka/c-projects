@@ -21,5 +21,6 @@ Bool STaddNode(STptr *, char*, char*, int);
 void printST( STptr );
 Bool isInST( STptr, char *, char* );
 
-int isInstruction(char *, Instruction *);
+int isInstruction(char *);
 int isOp(char *);
+Bool isArray( char *);

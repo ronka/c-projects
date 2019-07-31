@@ -13,8 +13,9 @@
 #define EXTERNALS_FILE_EXTENSION ".ext"
 #define OBJECT_FILE_NAME ".ob"
 
-#define MACRO ".define"
-#define CODE ".code"
+#define MACRO "macro"
+#define DEFINE ".define"
+#define CODE "code"
 #define STOP "stop"
 #define DATA ".data"
 #define STRING ".string"
@@ -24,14 +25,13 @@ typedef enum {
 } Bool;
 
 /* Opcodes enum table */
-typedef char* Opcode;
-/*typedef enum {
+typedef enum {
     mov,
     cmp,
     add,
     sub,
     not,
-    cls,
+    clr,
     lea,
     inc,
     dec,
@@ -42,7 +42,7 @@ typedef char* Opcode;
     jsr,
     rts,
     stop
-} Opcode;*/
+} Opcode;
 
 typedef struct {
     char *name;

@@ -9,53 +9,44 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
     int op, instr; /* var used to save operation and instraction */
     int cnt_lines = 0; /* current line */
     int DC = 0, IC = 0;
+    DC = DC + MEMORY_START;
     Bool labelFlag;
     Bool isStop = FALSE; /* checkstop flag */
 
-    Instruction instructions[] = {
-        {".data", 0},
-        {".string", 1},
-        {".extern", 2},
-        {".entry", 3}
-    };
-
     while (fgets(line, MAX_LINE, sourceFile)) {
         labelFlag = FALSE;
-        printf("---------------------------\nLINE: %d \n", cnt_lines);
+        printf("---------------------------\n");
 
         strncpy ( tempStr, line, MAX_LINE );
         
         /*
-         * If comment
+         * If comment, continue to next line
          * */
         if( *line == ';' || strlen(line) == 0 ){
             printf("- comment\n"); /* DELETE */
-            cnt_lines++;
             continue;
         }
 
         token = strtok(tempStr," ");
 
-        if( isMacro( token ) ){
-            
-            token = strtok(NULL, "=");
+        removeSpaces(token);
 
-            /* TODO: FIX THIS */
+        if( isMacro( token ) ){
+            token = strtok(NULL, "=");
+            
             removeSpaces(token);
 
             if( isRegister( token ) ){
-                printf("%s is not a valid label name!!!\n", token); /* DELETE */
+                printf("%s is not a valid macro name!!!\n", token); /* DELETE */
                 return FALSE;
             }
             
             /* TODO: HANDLE INVALID MACRO */
 
             strcpy( tempStr, token );
-
             token = strtok(NULL, " ");
 
-            token[strlen(token)-1]=0;
-
+            /* check if macro is already exsits */
             if( isInST(*SymbolTable, tempStr, MACRO) ){
                 printf("This macro allready exists"); /* DELETE */
                 return FALSE;
@@ -70,7 +61,7 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
         }
 
         if( isLabel( token ) ){
-            token[strlen(token) - 1] = '\0'; /* clean delim */
+            token[strlen(token) - 1] = '\0'; /* clean delim (:) */
             printf("- label: %s\n", token); /* DELETE */
 
             /**
@@ -96,13 +87,12 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
             labelFlag = FALSE; /* our flag if there is label */
         }
 
-        if( (instr = isInstruction( token, instructions )) > -1 ){
-            /* TODO: HANDLE .data  */
-            printf("- instruction: `%s`\n", instructions[instr].name); /* DELETE */
+        if( (instr = isInstruction( token )) > -1 ){
             switch (instr)
             {
             case 0: /* .data */
                 if( ! labelFlag ){
+                    /* if there is no label, no need to save the data */
                     continue;
                 }
                 
@@ -125,8 +115,22 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
 
                 continue;
             case 1: /* .string */
+                if( ! labelFlag ){
+                    /* if there is no label, no need to save the data */
+                    continue;
+                }
+
                 token = strtok(NULL," ");
 
+                removeSpaces(token);
+
+                /* check if valid string */
+                if( token[0] != '"' || token[strlen(token) - 1] != '"' ){
+                    printf("invalid string"); /* DELETE */
+                    exit(1);
+                    return FALSE;
+                }
+                
                 if( ! STaddNode( SymbolTable, tempStr, DATA, DC ) ){
                     printf("Failed to save symbol"); /* DELETE */
                     return FALSE;
@@ -136,8 +140,6 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
             case 2: /* extern */
                 token = strtok(NULL," ");
 
-                token[strlen(token)-1] = 0; /* remove last char EOF */
-
                 if( ! DTaddNode( extFile, token, DC ) ){
                     printf("Failed to save extern"); /* DELETE */
                     return FALSE;
@@ -145,8 +147,6 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
                 continue;
             case 3: /* entry */
                 token = strtok(NULL," ");
-
-                token[strlen(token)-1] = 0; /* remove last char EOF */
 
                 if( ! DTaddNode( entFile, token, DC ) ){
                     printf("Failed to save extern"); /* DELETE */
@@ -157,40 +157,78 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
             default:
                 break;
             }
-            /*(*instructions[instr].func)( tempStr, &SymbolTable, &DC, token );*/
-
-            /* TODO: HANDLE .extrn .entry */
         }
+
+        removeSpaces(token);
 
         if( (op = isOp( token )) > -1 ){
             if( labelFlag ){
+                if( isInST(*SymbolTable, tempStr, CODE) ){
+                    printf("This label allready exists"); /* DELETE */
+                    return FALSE;
+                }
+
                 if( ! STaddNode( SymbolTable, tempStr, CODE, DC ) ){
                     printf("failed to add to symbol table\n"); /* DELETE */
                     return FALSE;
-                } else{
-
                 }
             }
-            printf("- op: `%s`, number: %d\n", token, op); /* DELETE */
+
+            switch(op){
+                /* two args group */
+                case mov:
+                case cmp:
+                case add:
+                case sub:
+                case lea:
+                    /* get destination var */
+                    token = strtok(NULL, ",");
+                    
+                    removeSpaces(token);
+
+                    if( token[0] == '#' ){
+                        token++;
+                        /* if its not a digit and not a macro, through error */
+                        if( isdigit(atoi(token)) == 0 && ! isInST(*SymbolTable, tempStr, MACRO) ){
+                            printf("not a good number"); /* DELETE */
+                            return FALSE;
+                        }
+                        DC++;
+                    } else if( isRegister(token) ) {
+                        DC++;
+                    } else if( isArray( token ) ){
+                        DC += 2;
+                    }
+
+                    printf("%s",token);
+                    exit(1);
+
+                /* one arg group */
+                case not:
+                case clr:
+                case inc:
+                case dec:
+                case jmp:
+                case bne:
+                case red:
+                case prn:
+                case jsr:
+                 
+                /* no args group */
+                case rts:
+                case stop:
+                    
+                continue;
+            }
+
             token = strtok(NULL," ");
-        } else {
-            printf("not recognized op: %s", token);
-            return FALSE;
+
+            continue;
         }
 
-        /* TODO: CHECKSTOP */
-        if( !strcmp( STOP, token ) ){
-            printf("- stop\n"); /* DELETE */
-            isStop = TRUE;
-        }
+        printf("- not recognized op\n"); /* DELETE */
+        exit(1);
 
-        if( !(instr < 0 || op < 0 || isStop == FALSE) ){
-            printf("ERROR: NO ACTION/SYMBOL ERROR\n");
-            return FALSE;
-        }
-
-        cnt_lines++;
-        printf("---------------------------\n\n");
     }
 
     printf("SymbolTable:\n");
@@ -204,35 +242,3 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
 
     return TRUE;
 }
-/*
-Bool handleData(char *label, DTptr * SymbolTable, int *DC,char * token){
-    if( label != NULL ){
-        token = strtok(NULL," ");
-
-        if( ! DTaddData( SymbolTable, label, (*DC)) ){
-            printf("This label allready exists"); 
-            return FALSE;
-        }
-        do{
-            if( token[0] != '"' && ! isdigit(token) && ! isInDT(*SymbolTable, token) ){
-                printf("unrecognized macro %s", token);
-                return FALSE;
-            }
-            (*DC)++;
-        } while(token = strtok(NULL,","));
-    }
-
-    return TRUE;
-}
-
-Bool handleFile(char * label, DTptr * file, int *DC){
-    if( label == NULL ){
-        return FALSE;
-    }
-    if( ! DTaddData( *file, label, (*DC)) ){
-        printf("This label allready exists");
-        return FALSE;
-    }
-    return TRUE;
-}
-*/

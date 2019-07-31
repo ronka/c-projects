@@ -10,7 +10,7 @@ Bool isLabel( char* str ){
 int isOp( char* str ){
     int i;
 
-    Opcode opcodes[] = {
+    char *opcodes[] = {
         "mov",
         "cmp",
         "add",
@@ -39,15 +39,22 @@ int isOp( char* str ){
 }
 
 Bool isMacro( char *str ){
-   if( !strcmp( str, MACRO ) ){
+   if( !strcmp( str, DEFINE ) ){
         return TRUE;
     }
 
     return FALSE;
 }
 
-int isInstruction( char *str, Instruction insts[] ){
+int isInstruction( char *str ){
     int i;
+
+    Instruction insts[] = {
+        {".data", 0},
+        {".string", 1},
+        {".extern", 2},
+        {".entry", 3}
+    };
 
     for (i=0 ; i < INSTRUCTIONS_LENGTH; i++){
         if( !strcmp( str, insts[i].name ) ){
@@ -58,15 +65,26 @@ int isInstruction( char *str, Instruction insts[] ){
     return -1;
 }
 
-void removeSpaces(char* s) {
-    const char* d = s;
-    printf("removing spaces: ");
-    do {
-        printf("%s",*d);
-        while (*d == ' ') {
-            ++d;
-        }
-    } while (*s++ = *d++);
+void removeSpaces(char* str) {
+    char *end;
+
+    /* remove spacesin the start of string */
+    while(isspace((unsigned char)*str)){
+        str++;
+    }
+
+    /* if empty string */
+    if(*str == 0) {
+        return;
+    }
+
+    /* remove strings at the end */
+    end = str + strlen(str) - 1;
+    while(end > str && isspace((unsigned char)*end)){
+        end--;
+    }
+    
+    end[1] = '\0';
 }
 
 /**
@@ -78,4 +96,21 @@ Bool isRegister( char *reg ) {
         && reg[1] >= '0'
         && reg[1] <= '7'
 		&& reg[2] == '\0') ? TRUE : FALSE );
+}
+
+Bool isArray( char *arr ){
+    int i;
+    Bool flag = FALSE;
+
+    for( i=0 ; i < strlen(arr) ; i++ ){
+        if( arr[i] == '[' && !flag ){
+            flag = TRUE;
+        }
+
+        if( arr[i] == ']' && flag && arr[i+1] == '\0' ){
+            return TRUE;
+        }
+    }
+
+    return FALSE;
 }
