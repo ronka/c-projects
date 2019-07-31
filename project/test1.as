@@ -1,18 +1,21 @@
-;
-.define     len    =   4  
-;.entry   LOOP
-.define ssss=33
-.define aaaa = 1111   
-MAIN:      inc K
-    mov *,W
-    .extern    W
-    add    r2,STR
+; file ps.as
+
+.entry LIST
+.extern W
+.define sz = 2
+MAIN: mov r3, LIST[sz]
 LOOP: jmp W
-    prn    #3
-    TEST2: .data 3
-TEST: .data 2,5,3,2
-STR: .string "abd"   
-STR2:   .string "dd"
-    sub r1,    r4
-.entry STR
-K:     .data 2 , 7
+prn #-5
+    mov STR[5],STR[2]
+    sub r1,r4
+    cmp K, #sz
+    bne W
+L1: inc L3
+.entry LOOP
+    bne LOOP
+END: stop
+.define len = 4
+STR: .string "abcdef"
+LIST: .data 6,-9,len
+K: .data 22
+.extern L3

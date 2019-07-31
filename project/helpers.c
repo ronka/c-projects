@@ -87,9 +87,7 @@ void removeSpaces(char* str) {
     end[1] = '\0';
 }
 
-/**
- * Check if its a register name
- */
+/* Check if its a register name */
 
 Bool isRegister( char *reg ) {
 	return ( (reg[0] == 'r'
@@ -97,6 +95,10 @@ Bool isRegister( char *reg ) {
         && reg[1] <= '7'
 		&& reg[2] == '\0') ? TRUE : FALSE );
 }
+
+/**
+ *  Arrays
+ */
 
 Bool isArray( char *arr ){
     int i;
@@ -107,10 +109,22 @@ Bool isArray( char *arr ){
             flag = TRUE;
         }
 
-        if( arr[i] == ']' && flag && arr[i+1] == '\0' ){
+        if( flag && arr[i+1] == '\0' && arr[i] == ']' ){
             return TRUE;
         }
     }
 
     return FALSE;
+}
+
+/* extract index from array tokens, ex: LIST[sz] => sz */
+
+char * getIndexFromToken( char *arrToken ){
+    char * token;
+    int i = 0;
+
+    token = strtok(arrToken,"[");
+    token = strtok(NULL,"]");
+
+    return token;
 }

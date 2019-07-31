@@ -7,4 +7,4 @@ echo ""
 echo ""
 
 echo "Testing on files: test1"
-./assembler test
+./assembler test1

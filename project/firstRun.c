@@ -1,29 +1,26 @@
 #include "assembler.h"
 
-Bool handleData(char *, DTptr *, int *, char *);
-Bool handleFile(char *, DTptr *, int *);
+int getMemoryUsageOfOp( char *, STptr *, char *);
 
 Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFile){
     char line[MAX_LINE], tempStr[MAX_LINE];
     char *token;
     int op, instr; /* var used to save operation and instraction */
-    int cnt_lines = 0; /* current line */
-    int DC = 0, IC = 0;
+    int DC = 0, IC = 0; /* memory track */
+    Bool labelFlag, regFlag;
+
+
     DC = DC + MEMORY_START;
-    Bool labelFlag;
-    Bool isStop = FALSE; /* checkstop flag */
 
     while (fgets(line, MAX_LINE, sourceFile)) {
         labelFlag = FALSE;
-        printf("---------------------------\n");
-
+        regFlag = FALSE;
         strncpy ( tempStr, line, MAX_LINE );
         
         /*
          * If comment, continue to next line
          * */
-        if( *line == ';' || strlen(line) == 0 ){
-            printf("- comment\n"); /* DELETE */
+        if( *line == ';' || strlen(line) == 1 ){
             continue;
         }
 
@@ -62,8 +59,7 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
 
         if( isLabel( token ) ){
             token[strlen(token) - 1] = '\0'; /* clean delim (:) */
-            printf("- label: %s\n", token); /* DELETE */
-
+            
             /**
              *  check if label is valid name
              */
@@ -136,9 +132,17 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
                     return FALSE;
                 }
 
+                /* count string chars */
+                do{
+                    token++;
+                    DC++;
+                } while(token[0] != '"');
+
                 continue;
             case 2: /* extern */
                 token = strtok(NULL," ");
+
+                removeSpaces(token);
 
                 if( ! DTaddNode( extFile, token, DC ) ){
                     printf("Failed to save extern"); /* DELETE */
@@ -147,6 +151,8 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
                 continue;
             case 3: /* entry */
                 token = strtok(NULL," ");
+
+                removeSpaces(token);
 
                 if( ! DTaddNode( entFile, token, DC ) ){
                     printf("Failed to save extern"); /* DELETE */
@@ -181,28 +187,21 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
                 case add:
                 case sub:
                 case lea:
-                    /* get destination var */
+                    /* get origin op */
                     token = strtok(NULL, ",");
                     
                     removeSpaces(token);
 
-                    if( token[0] == '#' ){
-                        token++;
-                        /* if its not a digit and not a macro, throw error */
-                        if( isdigit(atoi(token)) == 0 && ! isInST(*SymbolTable, tempStr, MACRO) ){
-                            printf("not a good number"); /* DELETE */
-                            return FALSE;
-                        }
-                        DC++;
-                    } else if( isRegister(token) ) {
-                        DC++;
-                    } else if( isArray( token ) ){
-                        DC += 2;
+                    DC = DC + getMemoryUsageOfOp(token, SymbolTable, tempStr);
+
+                    if( isRegister( token ) ){
+                        regFlag = TRUE;
                     }
 
-                    printf("%s",token);
-                    exit(1);
+                    /* get next op */
+                    token = strtok(NULL, " ");
 
+                    removeSpaces(token);
                 /* one arg group */
                 case not:
                 case clr:
@@ -213,15 +212,26 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
                 case red:
                 case prn:
                 case jsr:
-                 
+                    /* get dest op */
+                    DC = DC + getMemoryUsageOfOp(token, SymbolTable, tempStr);
+
+                    if( isRegister( token ) ){
+                        regFlag = TRUE;
+                    }
                 /* no args group */
                 case rts:
                 case stop:
-                    
-                continue;
+                    DC++;
+                    break;
+                default:
+                    printf("- not recognized op\n"); /* DELETE */
+                    exit(1);
+                    break;
             }
 
-            token = strtok(NULL," ");
+            if( regFlag ){
+                DC++;
+            }
 
             continue;
         }
@@ -230,6 +240,8 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
         exit(1);
 
     }
+
+    printf("\nEND OF FIRST RUN: \n\n");
 
     printf("SymbolTable:\n");
     printST( *SymbolTable );
@@ -241,4 +253,25 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
     printDT( *entFile );
 
     return TRUE;
+}
+
+int getMemoryUsageOfOp( char * token, STptr * SymbolTable, char * tempStr ){
+    /* if( isMacro(token) ){
+        return 1;
+    } else if( token[0] == '#' ){
+        token++; /* skip the # char */
+        /* if( isdigit(atoi(token)) == 0 && ! isInST(*SymbolTable, token, MACRO) ){
+            printf("not a good number,%s",token); /* DELETE */
+            /* return FALSE;
+        }
+        return 1;
+    } else */
+    if( isRegister(token) ) {
+        /* if its a register in the dest op no need to increment DC */
+        return 0;
+    } else if( isArray( token ) ){
+        return 2;
+    }
+
+    return 1;
 }
