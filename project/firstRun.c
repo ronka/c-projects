@@ -188,7 +188,7 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
 
                     if( token[0] == '#' ){
                         token++;
-                        /* if its not a digit and not a macro, through error */
+                        /* if its not a digit and not a macro, throw error */
                         if( isdigit(atoi(token)) == 0 && ! isInST(*SymbolTable, tempStr, MACRO) ){
                             printf("not a good number"); /* DELETE */
                             return FALSE;
