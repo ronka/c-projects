@@ -13,6 +13,13 @@
 #define EXTERNALS_FILE_EXTENSION ".ext"
 #define OBJECT_FILE_NAME ".ob"
 
+#define DECODE_SIZE 2
+#define OPERAND_SIZE 2
+#define REG_SIZE 3
+#define OPCODE_SIZE 4
+#define UNUSED_SIZE 4
+#define VALUE_SIZE 12
+
 #define MACRO "macro"
 #define DEFINE ".define"
 #define CODE "code"
@@ -52,5 +59,34 @@ typedef struct {
     char *name;
     int num;
 } Instruction;
+
+typedef struct {
+	unsigned int decode : DECODE_SIZE;
+	unsigned int destOp : OPERAND_SIZE;
+	unsigned int srcOp : OPERAND_SIZE;
+	unsigned int opcode : OPCODE_SIZE;
+	unsigned int reserved : UNUSED_SIZE;
+} cmd_word;
+
+/* Structure of an argument word */
+typedef struct {
+	unsigned int decode: DECODE_SIZE;
+	unsigned int value : VALUE_SIZE;
+} arg_word;
+
+
+typedef struct {
+	unsigned int decode 	: DECODE_SIZE;
+	unsigned int destOperand: REG_SIZE;
+	unsigned int srcOperand : REG_SIZE;
+	unsigned int zeroBit 	: UNUSED_SIZE;
+} reg_word;
+
+typedef union {
+	cmd_word cmd;
+	reg_word reg;
+	arg_word num;
+	unsigned int print: 14;
+} word;
 
 #endif
