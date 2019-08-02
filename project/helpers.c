@@ -120,20 +120,40 @@ Bool isArray( char *arr ){
 /* extract index from array tokens, ex: LIST[sz] => sz */
 
 char * getIndexFromToken( char *arrToken ){
-    char * token;
-    int i = 0;
+    char * token = malloc(strlen(arrToken) + 1);
+    int i = 0, j = 0;
+    
+    while( arrToken[i] != '[' ){
+        i++;
+    }
 
-    token = strtok(arrToken,"[");
-    token = strtok(NULL,"]");
+    i++;
+
+    while( arrToken[i] != ']' ){
+        token[j] = arrToken[i];
+        i++;
+        j++;
+    }
+
+    token[i] = '\0';
 
     return token;
 }
 
-/* Reset A machine line all bits */
+/* extract label from array tokens, ex: LIST[sz] => LIST */
 
-void newMachineLine( word * machineLine ){
-    (*machineLine).num.decode = 0;
-    (*machineLine).num.value = 0;
+char * getLabelFromToken( char *arrToken ){
+    char * token = malloc(strlen(arrToken) + 1);
+    int i = 0;
+    
+    while( arrToken[i] != '[' ){
+        token[i] = arrToken[i];
+        i++;
+    }
+
+    token[i] = '\0';
+    
+    return token;
 }
 
 /* print two's complement */

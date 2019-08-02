@@ -31,3 +31,4 @@ int isInstruction(char *);
 int isOp(char *);
 Bool isArray( char *);
 char * getIndexFromToken( char * );
+char * getLabelFromToken( char * );

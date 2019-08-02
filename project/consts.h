@@ -56,6 +56,23 @@ typedef enum {
     stop
 } Opcode;
 
+typedef enum {
+    OPADDRESS_INSTANT,
+    OPADDRESS_DIRECT,
+    OPADDRESS_INDEX,
+    OPADDRESS_DIRECT_REG
+} opAddress;
+
+typedef enum {
+    OPADDRESS_ABSOLUTE,
+    OPADDRESS_EXTERNAL,
+    OPADDRESS_RELOCATABLE
+} opAddressType;
+
+/**
+ * Structs
+ */
+
 typedef struct {
     char *name;
     int num;
