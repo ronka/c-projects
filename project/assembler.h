@@ -13,6 +13,8 @@ Bool isLabel(char *);
 Bool isRegister(char*);
 Bool isMacro(char *);
 
+int getTwosComplement(int);
+
 void removeSpaces(char*);
 
 Bool DTaddNode(DTptr *, char*, int);
@@ -23,6 +25,7 @@ void updateDT( DTptr *, char *, int);
 Bool STaddNode(STptr *, char*, char*, int);
 void printST( STptr );
 Bool isInST( STptr, char *, char* );
+int getSTValue( STptr, char *, char *);
 
 int isInstruction(char *);
 int isOp(char *);

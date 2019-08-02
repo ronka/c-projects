@@ -128,3 +128,32 @@ char * getIndexFromToken( char *arrToken ){
 
     return token;
 }
+
+/* Reset A machine line all bits */
+
+void newMachineLine( word * machineLine ){
+    (*machineLine).num.decode = 0;
+    (*machineLine).num.value = 0;
+}
+
+/* print two's complement */
+
+int getTwosComplement(int num) { 
+    unsigned long mask = 1; /* create mask */
+    Bool flag = FALSE;
+    int i;
+
+    for (i = 0; i < WORD_SIZE; i++) { 
+        if( flag ){
+            num = (num^mask); /* flip bit */
+        }
+
+        if( !flag && ((num&mask) != 0) ){
+            flag = TRUE;
+        }
+
+        mask <<= 1;
+    } 
+    
+    return num;
+} 

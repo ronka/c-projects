@@ -1,5 +1,9 @@
 #include "assembler.h"
 
+/**
+ * Symbol table
+ */
+
 Bool STaddNode(STptr * head, char * name, char * type, int value) {
     STptr p1, t;
 
@@ -50,6 +54,19 @@ Bool isInST( STptr head, char * name, char * type ){
     }
 
     return FALSE;
+}
+
+int getSTValue( STptr head, char * name, char * type ){
+    STptr p1 = head;
+
+    while ( p1 != NULL ){
+        if( strcmp(p1->name,name) == 0 && strcmp(p1->type,type) == 0 ){
+            return p1->value;
+        }
+        p1 = p1->next;
+    }
+
+    return 0;
 }
 
 void printST( STptr head ){
@@ -131,4 +148,36 @@ void updateDT( DTptr * head, char * symbol, int value ){
         }
         p1 = p1->next;
     }
+}
+
+/**
+ * Machine Code Table
+ */
+Bool MCaddNode(MCptr * head, word value) {
+    MCptr p1, t;
+
+    t = ( MCptr ) malloc(sizeof(MCnode));
+
+    if( !t ){
+        return FALSE;
+    }
+
+    t->value = value;
+    t->next = NULL;
+
+    /* if list is empty, assign this node as head */
+    if( ( *head ) == NULL ){
+        *head = t;
+        return TRUE;
+    }
+
+    p1 = *head;
+
+    while( p1->next != NULL ){
+        p1 = p1->next;
+    }
+
+    p1->next = t;
+    
+    return TRUE;
 }

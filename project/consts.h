@@ -19,6 +19,7 @@
 #define OPCODE_SIZE 4
 #define UNUSED_SIZE 4
 #define VALUE_SIZE 12
+#define WORD_SIZE 14
 
 #define MACRO "macro"
 #define DEFINE ".define"
@@ -86,7 +87,7 @@ typedef union {
 	cmd_word cmd;
 	reg_word reg;
 	arg_word num;
-	unsigned int print: 14;
+	unsigned int print: WORD_SIZE;
 } word;
 
 #endif

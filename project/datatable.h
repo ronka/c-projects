@@ -20,3 +20,13 @@ typedef struct nodeDT {
     int value;
     DTptr next;
 } DTnode;
+
+/*
+ * Machine Code Table
+ */
+typedef struct nodeMC * MCptr;
+
+typedef struct nodeMC {
+    word value;
+    MCptr next;
+} MCnode;
