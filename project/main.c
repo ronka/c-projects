@@ -44,6 +44,8 @@ int main(int argc, char *argv[]) {
             printf("Failed parsing the file %s.\n", argv[i]);
             continue;
         }
+
+        printf("%s Compiled successfully\n\n", currentFileName);
     }
 
     return 0;

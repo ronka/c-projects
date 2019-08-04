@@ -184,7 +184,6 @@ Bool MCaddNode(MCptr * head, word value) {
 
 void MCreplaceNodeN( MCptr *head, word newValue, int n ){
     MCptr curr = *head;
-    MCptr prv = NULL;
     int i = 0;
 
     while( i < n ){

@@ -6,8 +6,8 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
     char line[MAX_LINE], tempStr[MAX_LINE];
     char *token;
     int op, inst; /* var used to save operation and instraction */
-    int DC = 0, IC = 0; /* memory track */
-    Bool regFlag;
+    int DC = 0, lineCnt = 1; /* memory track */
+    Bool regFlag, errorFlag = FALSE;
     DTptr extFileFinal = NULL;
     MCptr machineCode = NULL;
     MCptr tempMachineCode;
@@ -28,6 +28,7 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
  
         /* If comment, continue to next line */
         if( *line == ';' || strlen(line) == 1 ){
+            lineCnt++;
             continue;
         }
 
@@ -36,6 +37,7 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
         removeSpaces(token);
 
         if( isMacro( token ) ){ /* if its macro, skip */
+            lineCnt++;
             continue;
         } else if( isLabel( token ) ){ /* if its label, skip */
             token[strlen(token) - 1] = '\0'; /* clean delim (:) */
@@ -64,19 +66,21 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                         /* if macro */
                         machineLine.print = getSTValue( *SymbolTable, token, MACRO );
                     } else{
-                        printf("error parsing data, -%s - %d\n",token, token);
-                        return FALSE;
+                        printf("%04d - invalid string\n",lineCnt);
+                        lineCnt++;
+                        errorFlag = TRUE;
+                        continue;
                     }
 
                     if( ! MCaddNode( &machineCode, machineLine ) ){
-                        printf("Failed to save machine code"); /* DELETE */
-                        return FALSE;
+                        printf("Failed to save machine code\n");
+                        exit(1);
                     }
                     DC++;
 
                     token = strtok(NULL,",");
 
-                } while(token != '\0');
+                } while(token != NULL);
                 break;
             case INST_STRING: /* .string */
                 token = strtok(NULL," ");
@@ -88,8 +92,8 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                     machineLine.print = token[0];
                     
                     if( ! MCaddNode( &machineCode, machineLine ) ){
-                        printf("Failed to save machine code"); /* DELETE */
-                        return FALSE;
+                        printf("Failed to save machine code\n");
+                        exit(1);
                     }
                     token++;
                     DC++;
@@ -98,8 +102,8 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                 machineLine.print = 0;
                     
                 if( ! MCaddNode( &machineCode, machineLine ) ){
-                    printf("Failed to save machine code"); /* DELETE */
-                    return FALSE;
+                    printf("Failed to save machine code\n");
+                    exit(1);
                 }
 
                 DC++; /* for end of line */
@@ -109,7 +113,8 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
             default:
                 break;
             }
-            
+
+            lineCnt++;
             continue;
         }
 
@@ -117,8 +122,8 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
             machineLine.cmd.opcode = op;
 
             if( ! MCaddNode( &tempMachineCode, machineLine ) ){
-                printf("Failed to save machine code"); /* DELETE */
-                return FALSE;
+                printf("Failed to save machine code\n");
+                exit(1);
             }
             
             switch(op){
@@ -137,8 +142,8 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                         srcArg.reg.srcOperand = token[1] - '0'; /* if its a register, extract register number */
 
                         if( ! MCaddNode( &tempMachineCode, srcArg ) ){
-                            printf("Failed to save machine code"); /* DELETE */
-                            return FALSE;
+                            printf("Failed to save machine code\n");
+                            exit(1);
                         }
 
                         regFlag = TRUE;
@@ -156,13 +161,15 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                             /* if a macro */
                             srcArg.num.value = getSTValue( *SymbolTable, token, MACRO );
                         } else{
-                            printf("error parsing token insinde number %s",token); /* DELETE */
-                            return FALSE;
+                            printf("%04d - invalid number",lineCnt); /* DELETE */
+                            lineCnt++;
+                            errorFlag = TRUE;
+                            continue;
                         }
 
                         if( ! MCaddNode( &tempMachineCode, srcArg ) ){
-                            printf("Failed to save machine code"); /* DELETE */
-                            return FALSE;
+                            printf("Failed to save machine code \n"); /* DELETE */
+                            exit(1);
                         }
 
                         DC++;
@@ -184,13 +191,15 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                             /* if index of array is macro */
                             indexSrcArg.num.value = getSTValue( *SymbolTable, getIndexFromToken(tempStr), MACRO );
                         } else{
-                            printf("error parsing token insinde array %s",token);
-                            return FALSE;
+                            printf("%04d - invalid index",lineCnt);
+                            lineCnt++;
+                            errorFlag = TRUE;
+                            continue;
                         }
 
                         if( !(MCaddNode( &tempMachineCode, srcArg ) && MCaddNode( &tempMachineCode, indexSrcArg )) ){
-                            printf("Failed to save machine code"); /* DELETE */
-                            return FALSE;
+                            printf("Failed to save machine code\n");
+                            exit(1);
                         }
 
                         DC = DC + 2;
@@ -202,8 +211,8 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                         machineLine.cmd.srcOp = OPADDRESS_DIRECT;
 
                         if( ! MCaddNode( &tempMachineCode, srcArg ) ){
-                            printf("Failed to save machine code"); /* DELETE */
-                            return FALSE;
+                            printf("Failed to save machine code");
+                            exit(1);
                         }
                     } else if( isInDT( *extFile, token ) ) {
                         /* if index is from external file */
@@ -212,18 +221,20 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                         DC++;
 
                         if( ! DTaddNode( &extFileFinal, token, DC ) ){
-                            printf("Failed to save extern"); /* DELETE */
-                            return FALSE;
+                            printf("Failed to save extern");
+                            exit(1);
                         }
 
 
                         if( ! (MCaddNode( &tempMachineCode, srcArg )) ){
-                            printf("Failed to save machine code"); /* DELETE */
-                            return FALSE;
+                            printf("Failed to save machine code");
+                            exit(1);
                         }
                     } else{
-                        printf("dest op - error parsing token %s",line);
-                        return FALSE;
+                        printf("%04d - error parsing token\n",lineCnt);
+                        lineCnt++;
+                        errorFlag = TRUE;
+                        continue;
                     }
 
                 /* one arg group */
@@ -254,8 +265,8 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                             DC++;
 
                             if( ! MCaddNode( &tempMachineCode, destArg ) ){
-                                printf("Failed to save machine code"); /* DELETE */
-                                return FALSE;
+                                printf("Failed to save machine code"); 
+                                exit(1);
                             }
                         }
                     } else if( token[0] == '#' ){
@@ -271,13 +282,15 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                             /* if a macro */
                             destArg.num.value = getSTValue( *SymbolTable, token, MACRO );
                         } else{
-                            printf("error parsing token insinde number %s",token);
-                            return FALSE;
+                            printf("%04d - error parsing token insinde number\n",lineCnt);
+                            lineCnt++;
+                            errorFlag = TRUE;
+                            continue;
                         }
 
                         if( ! MCaddNode( &tempMachineCode, destArg ) ){
-                            printf("Failed to save machine code"); /* DELETE */
-                            return FALSE;
+                            printf("Failed to save machine code");
+                            exit(1);
                         }
 
                         DC++;
@@ -299,13 +312,15 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                             /* if index of array is macro */
                             indexDestArg.num.value = getSTValue( *SymbolTable, getIndexFromToken(tempStr), MACRO );
                         } else{
-                            printf("error parsing token insinde array %s",token);
-                            return FALSE;
+                            printf("%04d - invalid index inside array",lineCnt);
+                            lineCnt++;
+                            errorFlag = TRUE;
+                            continue;
                         }
 
                         if( ! (MCaddNode( &tempMachineCode, destArg ) && MCaddNode( &tempMachineCode, indexDestArg )) ){
-                            printf("Failed to save machine code"); /* DELETE */
-                            return FALSE;
+                            printf("Failed to save machine code");
+                            exit(1);
                         }
 
                         DC = DC + 2;
@@ -316,13 +331,13 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                         DC++;
 
                         if( ! DTaddNode( &extFileFinal, token, DC ) ){
-                            printf("Failed to save extern"); /* DELETE */
-                            return FALSE;
+                            printf("Failed to save extern");
+                            exit(1);
                         }
 
                         if( ! (MCaddNode( &tempMachineCode, destArg )) ){
-                            printf("Failed to save machine code"); /* DELETE */
-                            return FALSE;
+                            printf("Failed to save machine code");
+                            exit(1);
                         }
                     }  else if( isInST( *SymbolTable, token, DATA ) ){
                         destArg.num.decode = OPADDRESS_RELOCATABLE;
@@ -332,13 +347,15 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                         machineLine.cmd.destOp = OPADDRESS_DIRECT;
 
                         if( ! (MCaddNode( &tempMachineCode, destArg )) ){
-                            printf("Failed to save machine code"); /* DELETE */
-                            return FALSE;
+                            printf("Failed to save machine code");
+                            exit(1);
                         }
 
                     } else{
-                        printf("src op - error parsing line( %s ), token( %s )",line, token);
-                        return FALSE;
+                        printf("%04d - invalid token\n",lineCnt);
+                        lineCnt++;
+                        errorFlag = TRUE;
+                        continue;
                     }
 
                     /* update first line of the machine code chunk */
@@ -349,8 +366,10 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                     DC++; /* increment DC for machine code line */
                     break;
                 default:
-                    printf("- not recognized op\n"); /* DELETE */
-                    exit(1);
+                    printf("%04d not recognized op\n",lineCnt); /* DELETE */
+                    lineCnt++;
+                    errorFlag = TRUE;
+                    continue;
                     break;
             }
 
@@ -358,6 +377,8 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                 MCaddNode( &machineCode, tempMachineCode->value );
                 tempMachineCode = tempMachineCode->next;
             }
+
+            lineCnt++;
 
             continue;
 
@@ -370,7 +391,7 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
     writeDTFile( extFileFinal, fileName, EXTERNALS_FILE_EXTENSION );
     writeDTFile( *entFile, fileName, ENTRIES_FILE_EXTENSION );
 
-    return TRUE;
+    return ! errorFlag;
 }
 
 /* Reset A machine line all bits */
