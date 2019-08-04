@@ -22,11 +22,12 @@
 #define WORD_SIZE 14
 
 #define MACRO "macro"
-#define DEFINE ".define"
 #define CODE "code"
 #define STOP "stop"
 #define DATA ".data"
 #define STRING ".string"
+#define DEFINE ".define"
+#define EXTERN ".extern"
 
 typedef enum {
 	FALSE, TRUE

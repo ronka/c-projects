@@ -22,8 +22,9 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
     int op, inst; /* var used to save operation and instraction */
     int DC = 0, IC = 0; /* memory track */
     Bool regFlag;
+    DTptr extFileFinal = NULL;
     MCptr machineCode = NULL;
-    word machineLine, srcArg, destArg, indexSrcArg, indexDescArg2;
+    word machineLine, srcArg, destArg, indexSrcArg, indexDestArg;
 
     DC = DC + MEMORY_START;
 
@@ -33,11 +34,11 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
         newMachineLine( &srcArg );
         newMachineLine( &destArg );
         newMachineLine( &indexSrcArg );
-        newMachineLine( &indexDescArg2 );
+        newMachineLine( &indexDestArg );
         regFlag = FALSE;
         strncpy ( tempStr, line, MAX_LINE );
 
-        printf("%s\n",line);
+        printf("%d -- %s\n",DC, line);
 
         /*
          * If comment, continue to next line
@@ -59,6 +60,7 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                 updateDT(entFile, token, DC);
             }
             token = strtok(NULL," ");
+            removeSpaces(token);
         }
 
         if( (inst = isInstruction( token )) > -1 ){
@@ -109,6 +111,14 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                     DC++;
                 } while(token[0] != '"');
 
+                machineLine.print = 0;
+                    
+                if( ! MCaddNode( &machineCode, machineLine ) ){
+                    printf("Failed to save machine code"); /* DELETE */
+                    return FALSE;
+                }
+
+                DC++; /* for end of line */
                 break;
             case INST_EXTERN: /* extern */
             case INST_ENTERY: /* entry */
@@ -133,10 +143,14 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                     removeSpaces(token);
 
                     if( isRegister( token ) ){
+                        /* if its a register, extract register number */
                         machineLine.cmd.srcOp = OPADDRESS_DIRECT_REG;
-                        regFlag = TRUE;
                         srcArg.reg.srcOperand = token[1] - '0';
+
+                        regFlag = TRUE;
+                        DC++;
                     } else if( token[0] == '#' ){
+                        /* if its a number */
                         machineLine.cmd.srcOp = OPADDRESS_DIRECT;
                         token++;
                         strcpy(tempStr, token);
@@ -146,11 +160,13 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                             srcArg.reg.srcOperand = strtol(tempStr, NULL, 10);
                         } else if( isInST(*SymbolTable, token, MACRO) ){
                             /* if a macro */
-                            srcArg.num.value = machineLine.print = getSTValue( *SymbolTable, token, MACRO );
+                            srcArg.num.value = getSTValue( *SymbolTable, token, MACRO );
                         } else{
                             printf("error parsing token insinde number %s",token);
                             return FALSE;
                         }
+
+                        DC++;
                     } else if( isArray( token ) ){
                         strcpy(tempStr, token);
                         if( isInDT( *extFile, getLabelFromToken(tempStr) ) ){
@@ -177,17 +193,17 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                             printf("error parsing token insinde array %s",token);
                             return FALSE;
                         }
+
+                        DC = DC + 2;
                     } else if( isInST( *SymbolTable, token, DATA ) ){
                         srcArg.num.decode = OPADDRESS_RELOCATABLE;
                         srcArg.num.value = getSTValue( *SymbolTable, token, DATA );
+                        DC++;
                     } else{
-                        printf("error parsing token %s",line);
+                        printf("dest op - error parsing token %s",line);
                         return FALSE;
                     }
 
-                    /* get next op */
-                    token = strtok(NULL, " ");
-                    removeSpaces(token);
                 /* one arg group */
                 case not:
                 case clr:
@@ -198,12 +214,93 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                 case red:
                 case prn:
                 case jsr:
-                    /* get dest op */
+                    /* get next op */
+                    token = strtok(NULL, " ");
+                    removeSpaces(token);
+
+                    if( isRegister( token ) ){
+                        if( regFlag ){
+                            /* if there was allready a register machine line */
+                            machineLine.cmd.destOp = OPADDRESS_DIRECT_REG;
+                            srcArg.reg.destOperand = token[1] - '0';
+                        } else{
+                            machineLine.cmd.destOp = OPADDRESS_DIRECT_REG;
+                            destArg.reg.destOperand = token[1] - '0';
+
+                            DC++;
+                        }
+                    } else if( token[0] == '#' ){
+                        /* if its a number */
+                        machineLine.cmd.destOp = OPADDRESS_DIRECT;
+                        token++;
+                        strcpy(tempStr, token);
+
+                        if( strtol(tempStr, NULL, 10) != 0 ){
+                            /* if a regular number */
+                            destArg.reg.srcOperand = strtol(tempStr, NULL, 10);
+                        } else if( isInST(*SymbolTable, token, MACRO) ){
+                            /* if a macro */
+                            destArg.num.value = getSTValue( *SymbolTable, token, MACRO );
+                        } else{
+                            printf("error parsing token insinde number %s",token);
+                            return FALSE;
+                        }
+                        DC++;
+                    } else if( isArray( token ) ){
+                        strcpy(tempStr, token);
+                        if( isInDT( *extFile, getLabelFromToken(tempStr) ) ){
+                            destArg.num.decode = OPADDRESS_EXTERNAL;
+                        } else{
+                            destArg.num.decode = OPADDRESS_RELOCATABLE;
+                            destArg.num.value = getSTValue( *SymbolTable, getLabelFromToken(tempStr), DATA );
+                        }
+
+                        strcpy(tempStr, token);
+                        if( strtol(getIndexFromToken(tempStr), NULL, 10) != 0 ){
+                            /* if index of array is number */
+                            indexDestArg.num.value = strtol(getIndexFromToken(tempStr), NULL, 10);
+                        } else if(isInST( *SymbolTable, getIndexFromToken(tempStr), MACRO )){
+                            /* if index of array is macro */
+                            indexDestArg.num.value = getSTValue( *SymbolTable, getIndexFromToken(tempStr), MACRO );
+                            if( isInDT( *extFile, getLabelFromToken(tempStr) ) ){
+                                /* if index is from external file */
+                                indexDestArg.num.decode = OPADDRESS_EXTERNAL;
+
+                                if( ! DTaddNode( &extFileFinal, token, DC ) ){
+                                    printf("Failed to save extern"); /* DELETE */
+                                    return FALSE;
+                                }
+                            } else{
+                                indexDestArg.num.decode = OPADDRESS_RELOCATABLE;
+                            }
+                        } else{
+                            printf("error parsing token insinde array %s",token);
+                            return FALSE;
+                        }
+
+                        DC = DC + 2;
+                    } else if( isInST( *SymbolTable, token, DATA ) ){
+                        destArg.num.decode = OPADDRESS_RELOCATABLE;
+                        destArg.num.value = getSTValue( *SymbolTable, token, DATA );
+                        DC++;
+                    } else if( isInDT( *extFile, token ) ) {
+                        /* if index is from external file */
+                        destArg.num.decode = OPADDRESS_EXTERNAL;
+                        DC++;
+
+                        if( ! DTaddNode( &extFileFinal, token, DC ) ){
+                            printf("Failed to save extern"); /* DELETE */
+                            return FALSE;
+                        }
+                    } else{
+                        printf("src op - error parsing line( %s ), token( %s )",line, token);
+                        return FALSE;
+                    }
 
                 /* no args group */
                 case rts:
                 case stop:
-                    DC++;
+                    DC++; /* increment DC for machine code line */
                     break;
                 default:
                     printf("- not recognized op\n"); /* DELETE */
@@ -223,7 +320,7 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
     printST( *SymbolTable );
 
     printf("\nextFile:\n");
-    printDT( *extFile );
+    printDT( extFileFinal );
 
     printf("\nentFile:\n");
     printDT( *entFile );
