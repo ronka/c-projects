@@ -34,3 +34,8 @@ char * getIndexFromToken( char * );
 char * getLabelFromToken( char * );
 
 Bool MCaddNode(MCptr *, word);
+
+void print_short_bin(unsigned short int);
+void printMC( MCptr );
+void MCreplaceNodeN( MCptr *, word , int );
+char * getBase4( word );

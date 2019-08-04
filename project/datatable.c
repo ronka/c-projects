@@ -181,3 +181,32 @@ Bool MCaddNode(MCptr * head, word value) {
     
     return TRUE;
 }
+
+void MCreplaceNodeN( MCptr *head, word newValue, int n ){
+    MCptr curr = *head;
+    MCptr prv = NULL;
+    int i = 0;
+
+    while( i < n ){
+        if( curr == NULL || curr->next == NULL ){
+            printf("error finding node"); /* DELETE */
+            exit(1);
+        }
+        curr = curr->next;
+        i++;
+    }
+
+    curr->value = newValue;
+
+}
+
+void printMC( MCptr  head ){
+    MCptr p1 = head;
+    int i = 0;
+
+    while ( p1 != NULL ){
+        printf("%04d - %s\n", i, getBase4( p1->value ));
+        i++;
+        p1 = p1->next;
+    }
+}

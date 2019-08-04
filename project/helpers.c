@@ -177,3 +177,53 @@ int getTwosComplement(int num) {
     
     return num;
 } 
+
+void print_short_bin(unsigned short int x){
+    unsigned int mask = 1 << ( WORD_SIZE - 1 );
+
+    while( mask ){
+        if( (x&mask) == 0){
+            printf("0");
+        } else{
+            printf("1");
+        }
+        mask >>= 1;
+    }
+}
+
+char * getBase4( word line ){
+    unsigned int mask01 = 1; /* 1 in binary == ..00001 */
+    unsigned int mask10 = 2; /* 2 in binary == ..00010 */
+    char * result = malloc(WORD_SIZE/2 - 1); /* every 2 bits are 1, minus one because array index starts at 0 */
+    int i = WORD_SIZE/2 - 1;
+    
+    if(!result) {
+        printf("error allocated memeory"); /* DELETe */
+        exit(1);
+    }
+
+    while( mask01 && mask10 && i >= 0 ){
+        if( (line.print&mask10) == 0 && (line.print&mask01) == 0 ){
+            /* 00 */
+            result[i] = '*';
+        } else if( (line.print&mask10) == 0 && (line.print&mask01) != 0 ){
+            /* 01 */
+            result[i] = '#';
+        } else if( (line.print&mask10) != 0 && (line.print&mask01) == 0 ){
+            /* 10 */
+            result[i] = '%';
+        } else if( (line.print&mask10) != 0 && (line.print&mask01) != 0 ){
+            /* 11 */
+            result[i] = '!';
+        } else{
+            result[i] = 'X';
+        }
+        mask01 <<= 2;
+        mask10 <<= 2;
+        i--;
+    }
+
+    result[WORD_SIZE/2] = '\0';
+
+    return result;
+}

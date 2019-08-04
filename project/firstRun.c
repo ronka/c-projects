@@ -68,7 +68,7 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
                 return FALSE;
             }
 
-            if( isInST(*SymbolTable, token, CODE) ){
+            if( isInST(*SymbolTable, token, DATA) ){
                 printf("This label allready exists"); /* DELETE */
                 return FALSE;
             }
@@ -168,12 +168,12 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
 
         if( (op = isOp( token )) > -1 ){
             if( labelFlag ){
-                if( isInST(*SymbolTable, tempStr, CODE) ){
+                if( isInST(*SymbolTable, tempStr, DATA) ){
                     printf("This label allready exists"); /* DELETE */
                     return FALSE;
                 }
 
-                if( ! STaddNode( SymbolTable, tempStr, CODE, DC ) ){
+                if( ! STaddNode( SymbolTable, tempStr, DATA, DC ) ){
                     printf("failed to add to symbol table\n"); /* DELETE */
                     return FALSE;
                 }
