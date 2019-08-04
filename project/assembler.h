@@ -32,3 +32,5 @@ int isOp(char *);
 Bool isArray( char *);
 char * getIndexFromToken( char * );
 char * getLabelFromToken( char * );
+
+Bool MCaddNode(MCptr *, word);
