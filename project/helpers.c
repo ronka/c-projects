@@ -227,3 +227,14 @@ char * getBase4( word line ){
 
     return result;
 }
+
+
+/**
+ * concat 2 strings
+ */
+char* concat(char *s1, char *s2) {
+    char *result = malloc(strlen(s1) + strlen(s2) + 1);
+    strcpy(result, s1);
+    strcat(result, s2);
+    return result;
+}

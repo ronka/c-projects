@@ -2,7 +2,7 @@
 
 void newMachineLine( word * );
 
-Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFile){
+Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFile, char * fileName){
     char line[MAX_LINE], tempStr[MAX_LINE];
     char *token;
     int op, inst; /* var used to save operation and instraction */
@@ -25,8 +25,6 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
         tempMachineCode = NULL;
         regFlag = FALSE;
         strncpy ( tempStr, line, MAX_LINE );
-
-        printf("%d -- %s\n",DC, line);
  
         /* If comment, continue to next line */
         if( *line == ';' || strlen(line) == 1 ){
@@ -380,6 +378,11 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
 
     printf("\nMachine Code:\n");
     printMC( machineCode );
+
+    writeObjFile( machineCode, fileName );
+    writeDTFile( extFileFinal, fileName, EXTERNALS_FILE_EXTENSION );
+    writeDTFile( *entFile, fileName, ENTRIES_FILE_EXTENSION );
+
 
     return TRUE;
 }

@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv[]) {
     int i;
-    char *currentFileName;
+    char *currentFileName, *fileNameNoSuffix;
     Bool status;
     FILE *sourceFile;
     STptr SymbolTable = NULL;
@@ -14,8 +14,10 @@ int main(int argc, char *argv[]) {
     }
 
     for (i = 1; i < argc; i++){
+        fileNameNoSuffix = malloc(strlen(argv[i]));
         currentFileName = malloc(strlen(argv[i]) + strlen(SOURCE_FILE_EXTENSION) + 1);
 
+        sprintf(fileNameNoSuffix, "%s", argv[i]);
         sprintf(currentFileName, "%s%s", argv[i], SOURCE_FILE_EXTENSION);
         printf("Compiling %s...\n", currentFileName);
 
@@ -36,10 +38,10 @@ int main(int argc, char *argv[]) {
             continue;
         }
 
-        status = secondRun(sourceFile, &SymbolTable, &extFile, &entFile);
+        status = secondRun(sourceFile, &SymbolTable, &extFile, &entFile, fileNameNoSuffix);
 
         if( ! status ){
-            printf("Failed parsing the file %s.\n", currentFileName);
+            printf("Failed parsing the file %s.\n", argv[i]);
             continue;
         }
     }

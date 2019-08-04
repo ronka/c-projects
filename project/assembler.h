@@ -7,7 +7,7 @@
 #include "datatable.h"
 
 Bool firstRun(FILE *, STptr *, DTptr *, DTptr *);
-Bool secondRun(FILE *, STptr *, DTptr *, DTptr *);
+Bool secondRun(FILE *, STptr *, DTptr *, DTptr *, char *);
 
 Bool isLabel(char *);
 Bool isRegister(char*);
@@ -39,3 +39,7 @@ void print_short_bin(unsigned short int);
 void printMC( MCptr );
 void MCreplaceNodeN( MCptr *, word , int );
 char * getBase4( word );
+char* concat(char *, char *);
+
+Bool writeObjFile( MCptr, char *);
+Bool writeDTFile( DTptr , char * , char * );
