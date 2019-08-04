@@ -33,7 +33,7 @@ Bool writeDTFile( DTptr  head, char * fileName, char * suffix ){
 
     while ( p1 != NULL ){
         /* print some text */
-        fprintf(f, "%s - %04d\n", p1->name, p1->value);
+        fprintf(f, "%s\t %04d\n", p1->name, p1->value);
         p1 = p1->next;
     }
 

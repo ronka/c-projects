@@ -365,24 +365,10 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
 
     }
 
-    printf("\nEND OF SECOND RUN: \n\n");
-
-    printf("SymbolTable:\n");
-    printST( *SymbolTable );
-
-    printf("\nextFile:\n");
-    printDT( extFileFinal );
-
-    printf("\nentFile:\n");
-    printDT( *entFile );
-
-    printf("\nMachine Code:\n");
-    printMC( machineCode );
-
     writeObjFile( machineCode, fileName );
+    
     writeDTFile( extFileFinal, fileName, EXTERNALS_FILE_EXTENSION );
     writeDTFile( *entFile, fileName, ENTRIES_FILE_EXTENSION );
-
 
     return TRUE;
 }
