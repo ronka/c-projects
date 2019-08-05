@@ -78,6 +78,16 @@ void printST( STptr head ){
     }
 }
 
+void freeST(STptr head){
+    STptr p1;
+
+    while (head != NULL){
+       p1 = head;
+       head = head->next;
+       free(p1);
+    }
+}
+
 /*
  * Data Table Stuff
  */
@@ -150,6 +160,16 @@ void updateDT( DTptr * head, char * symbol, int value ){
     }
 }
 
+void freeDT(DTptr head){
+    DTptr p1;
+
+    while (head != NULL){
+       p1 = head;
+       head = head->next;
+       free(p1);
+    }
+}
+
 /**
  * Machine Code Table
  */
@@ -207,5 +227,15 @@ void printMC( MCptr  head ){
         printf("%04d - %s\n", i, getBase4( p1->value ));
         i++;
         p1 = p1->next;
+    }
+}
+
+void freeMC(MCptr head){
+    MCptr p1;
+
+    while (head != NULL){
+       p1 = head;
+       head = head->next;
+       free(p1);
     }
 }

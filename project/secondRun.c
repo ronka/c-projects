@@ -3,14 +3,15 @@
 void newMachineLine( word * );
 
 Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFile, char * fileName){
-    char line[MAX_LINE], tempStr[MAX_LINE];
-    char *token;
+    char *line = malloc(MAX_LINE);
+    char *tempStr = malloc(MAX_LINE);
+    char *token = malloc(MAX_LINE);
     int op, inst; /* var used to save operation and instraction */
     int DC = 0, lineCnt = 1; /* memory track */
     Bool regFlag, errorFlag = FALSE;
     DTptr extFileFinal = NULL;
     MCptr machineCode = NULL;
-    MCptr tempMachineCode;
+    MCptr tempMachineCode = NULL;
     word machineLine, srcArg, destArg, indexSrcArg, indexDestArg;
 
     DC = DC + MEMORY_START;
@@ -312,7 +313,8 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                             /* if index of array is macro */
                             indexDestArg.num.value = getSTValue( *SymbolTable, getIndexFromToken(tempStr), MACRO );
                         } else{
-                            printf("%04d - invalid index inside array",lineCnt);
+                            printf("%s, %s\n", tempStr, getIndexFromToken(tempStr));
+                            printf("%04d - invalid index inside array\n",lineCnt);
                             lineCnt++;
                             errorFlag = TRUE;
                             continue;
@@ -379,7 +381,6 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
             }
 
             lineCnt++;
-
             continue;
 
         }

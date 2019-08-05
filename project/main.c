@@ -3,7 +3,7 @@
 int main(int argc, char *argv[]) {
     int i;
     char *currentFileName, *fileNameNoSuffix;
-    Bool status;
+    Bool isCompiled;
     FILE *sourceFile;
     STptr SymbolTable = NULL;
     DTptr extFile = NULL, entFile = NULL; /* data table */
@@ -14,6 +14,10 @@ int main(int argc, char *argv[]) {
     }
 
     for (i = 1; i < argc; i++){
+        isCompiled = TRUE;
+        extFile = NULL;
+        entFile = NULL;
+        SymbolTable = NULL;
         fileNameNoSuffix = malloc(strlen(argv[i]));
         currentFileName = malloc(strlen(argv[i]) + strlen(SOURCE_FILE_EXTENSION) + 1);
 
@@ -28,25 +32,37 @@ int main(int argc, char *argv[]) {
             continue;
         }
 
-        status = firstRun(sourceFile, &SymbolTable, &extFile, &entFile);
+        isCompiled = firstRun(sourceFile, &SymbolTable, &extFile, &entFile);
 
         rewind(sourceFile);
 
         /* if first run on the file failed */
-        if( ! status ){
+        if( ! isCompiled ){
             printf("Unable to parse %s.\n", currentFileName);
+            cleanUp(fileNameNoSuffix, currentFileName, SymbolTable, extFile, entFile);
             continue;
         }
 
-        status = secondRun(sourceFile, &SymbolTable, &extFile, &entFile, fileNameNoSuffix);
+        isCompiled = secondRun(sourceFile, &SymbolTable, &extFile, &entFile, fileNameNoSuffix);
 
-        if( ! status ){
+        if( ! isCompiled ){
             printf("Failed parsing the file %s.\n", argv[i]);
+            cleanUp(fileNameNoSuffix, currentFileName, SymbolTable, extFile, entFile);
             continue;
         }
 
         printf("%s Compiled successfully\n\n", currentFileName);
     }
 
+    cleanUp(fileNameNoSuffix, currentFileName, SymbolTable, extFile, entFile);
+
     return 0;
+}
+
+void cleanUp( char* str1,char* str2,STptr st, DTptr dt, DTptr dt2){
+    free(str1);
+    free(str2);
+    freeST( st );
+    freeDT( dt );
+    freeDT( dt2 );
 }

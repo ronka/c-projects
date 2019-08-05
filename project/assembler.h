@@ -43,3 +43,8 @@ char* concat(char *, char *);
 
 Bool writeObjFile( MCptr, char *);
 Bool writeDTFile( DTptr , char * , char * );
+
+void freeST( STptr );
+void freeDT( DTptr );
+void freeMC( MCptr );
+void cleanUp( char*,char*,STptr, DTptr, DTptr);
