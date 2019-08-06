@@ -175,22 +175,25 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
 
                         DC++;
                     } else if( isArray( token ) ){
-                        strcpy(tempStr, token);
+                        getLabelFromToken(token, tempStr);
+
                         machineLine.cmd.srcOp = OPADDRESS_INDEX;
-                        if( isInDT( *extFile, getLabelFromToken(tempStr) ) ){
+
+                        if( isInDT( *extFile, tempStr ) ){
                             srcArg.num.decode = OPADDRESS_EXTERNAL;
                         } else{
                             srcArg.num.decode = OPADDRESS_RELOCATABLE;
-                            srcArg.num.value = getSTValue( *SymbolTable, getLabelFromToken(tempStr), DATA );
+                            srcArg.num.value = getSTValue( *SymbolTable, tempStr, DATA );
                         }
 
-                        strcpy(tempStr, token);
-                        if( strtol(getIndexFromToken(tempStr), NULL, 10) != 0 ){
+                        getIndexFromToken(token, tempStr);
+
+                        if( strtol(tempStr, NULL, 10) != 0 ){
                             /* if index of array is number */
-                            indexSrcArg.num.value = strtol(getIndexFromToken(tempStr), NULL, 10);
-                        } else if(isInST( *SymbolTable, getIndexFromToken(tempStr), MACRO )){
+                            indexSrcArg.num.value = strtol(tempStr, NULL, 10);
+                        } else if(isInST( *SymbolTable, tempStr, MACRO )){
                             /* if index of array is macro */
-                            indexSrcArg.num.value = getSTValue( *SymbolTable, getIndexFromToken(tempStr), MACRO );
+                            indexSrcArg.num.value = getSTValue( *SymbolTable, tempStr, MACRO );
                         } else{
                             printf("%04d - invalid index",lineCnt);
                             lineCnt++;
@@ -296,24 +299,26 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
 
                         DC++;
                     } else if( isArray( token ) ){
-                        strcpy(tempStr, token);
+                        getLabelFromToken(token, tempStr);
+
                         machineLine.cmd.destOp = OPADDRESS_INDEX;
-                        if( isInDT( *extFile, getLabelFromToken(tempStr) ) ){
+                        if( isInDT( *extFile, tempStr ) ){
                             destArg.num.decode = OPADDRESS_EXTERNAL;
                         } else{
                             destArg.num.decode = OPADDRESS_RELOCATABLE;
-                            destArg.num.value = getSTValue( *SymbolTable, getLabelFromToken(tempStr), DATA );
+                            destArg.num.value = getSTValue( *SymbolTable, tempStr, DATA );
                         }
 
-                        strcpy(tempStr, token);
-                        if( strtol(getIndexFromToken(tempStr), NULL, 10) != 0 ){
+                        getIndexFromToken(token, tempStr);
+
+                        if( strtol(tempStr, NULL, 10) != 0 ){
                             /* if index of array is number */
-                            indexDestArg.num.value = strtol(getIndexFromToken(tempStr), NULL, 10);
-                        } else if(isInST( *SymbolTable, getIndexFromToken(tempStr), MACRO )){
+                            indexDestArg.num.value = strtol(tempStr, NULL, 10);
+                        } else if(isInST( *SymbolTable, tempStr, MACRO )){
                             /* if index of array is macro */
-                            indexDestArg.num.value = getSTValue( *SymbolTable, getIndexFromToken(tempStr), MACRO );
+                            indexDestArg.num.value = getSTValue( *SymbolTable, tempStr, MACRO );
                         } else{
-                            printf("%s, %s\n", tempStr, getIndexFromToken(tempStr));
+                            printf("%s, %s\n", tempStr, tempStr);
                             printf("%04d - invalid index inside array\n",lineCnt);
                             lineCnt++;
                             errorFlag = TRUE;
@@ -389,8 +394,12 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
 
     writeObjFile( machineCode, fileName );
     
-    writeDTFile( extFileFinal, fileName, EXTERNALS_FILE_EXTENSION );
-    writeDTFile( *entFile, fileName, ENTRIES_FILE_EXTENSION );
+    if( extFileFinal != NULL ){
+        writeDTFile( extFileFinal, fileName, EXTERNALS_FILE_EXTENSION );
+    }
+    if( *entFile != NULL ){
+        writeDTFile( *entFile, fileName, ENTRIES_FILE_EXTENSION );
+    }
 
     return ! errorFlag;
 }

@@ -30,8 +30,8 @@ int getSTValue( STptr, char *, char *);
 int isInstruction(char *);
 int isOp(char *);
 Bool isArray( char *);
-char * getIndexFromToken( char * );
-char * getLabelFromToken( char * );
+char * getIndexFromToken( char *, char * );
+char * getLabelFromToken( char *, char * );
 
 Bool MCaddNode(MCptr *, word);
 

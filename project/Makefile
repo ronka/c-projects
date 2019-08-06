@@ -20,7 +20,7 @@ files.o: files.c assembler.h
 	$(COMPILE_MACRO) -c files.c
 
 clean:
-	-@rm *.o *~ assembler
+	-@rm *.o *.ent *.ext *.ob *~ assembler
 
 # main: main.c symbollocation.o instructionqueue.o list.o memory.o logging.o codesection.o datasection.o parser.o symboltable.o opcodemap.o
 # 	$(COMPILE_MACRO) symbollocation.o instructionqueue.o list.o memory.o logging.o codesection.o datasection.o opcodemap.o symboltable.o parser.o main.c -o main

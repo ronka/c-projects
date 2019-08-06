@@ -119,7 +119,7 @@ Bool isArray( char *arr ){
 
 /* extract index from array tokens, ex: LIST[sz] => sz */
 
-char * getIndexFromToken( char *arrToken ){
+char * getIndexFromToken( char *arrToken, char *result ){
     char * token = malloc(strlen(arrToken) + 1);
     int i = 0, j = 0;
     
@@ -137,12 +137,15 @@ char * getIndexFromToken( char *arrToken ){
 
     token[i] = '\0';
 
-    return token;
+    strcpy( result, token );
+    free(token);
+    
+    return result;
 }
 
 /* extract label from array tokens, ex: LIST[sz] => LIST */
 
-char * getLabelFromToken( char *arrToken ){
+char * getLabelFromToken( char *arrToken, char*result ){
     char * token = malloc(strlen(arrToken) + 1);
     int i = 0;
     
@@ -153,7 +156,10 @@ char * getLabelFromToken( char *arrToken ){
 
     token[i] = '\0';
     
-    return token;
+    strcpy( result, token );
+    free(token);
+    
+    return result;
 }
 
 /* print two's complement */
