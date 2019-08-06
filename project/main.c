@@ -59,6 +59,9 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
+/**
+ * Clean up all main.c allocated memory
+ */
 void cleanUp( char* str1,char* str2,STptr st, DTptr dt, DTptr dt2){
     free(str1);
     free(str2);

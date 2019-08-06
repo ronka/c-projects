@@ -392,16 +392,21 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
 
     }
 
+    if( errorFlag ){
+        return FALSE;
+    }
+
     writeObjFile( machineCode, fileName );
     
     if( extFileFinal != NULL ){
         writeDTFile( extFileFinal, fileName, EXTERNALS_FILE_EXTENSION );
     }
+    
     if( *entFile != NULL ){
         writeDTFile( *entFile, fileName, ENTRIES_FILE_EXTENSION );
     }
 
-    return ! errorFlag;
+    return TRUE;
 }
 
 /* Reset A machine line all bits */

@@ -1,12 +1,13 @@
 #include "assembler.h"
 
+/* check if token is label */
 Bool isLabel( char* str ){
     if(str[strlen(str) - 1] == ':'){
         return TRUE;
     }
     return FALSE;
 }
-
+/* check if token is an oparend, if yes return number of oparend */
 int isOp( char* str ){
     int i;
 
@@ -38,6 +39,7 @@ int isOp( char* str ){
     return -1;
 }
 
+/* check if token is macro */
 Bool isMacro( char *str ){
    if( !strcmp( str, DEFINE ) ){
         return TRUE;
@@ -46,6 +48,7 @@ Bool isMacro( char *str ){
     return FALSE;
 }
 
+/* check if token is an instruction, if yes return its number */
 int isInstruction( char *str ){
     int i;
 
@@ -65,6 +68,7 @@ int isInstruction( char *str ){
     return -1;
 }
 
+/* remove spaces from end and begining of a string */
 void removeSpaces(char* str) {
     char *end;
 
@@ -88,7 +92,6 @@ void removeSpaces(char* str) {
 }
 
 /* Check if its a register name */
-
 Bool isRegister( char *reg ) {
 	return ( (reg[0] == 'r'
         && reg[1] >= '0'
@@ -97,9 +100,10 @@ Bool isRegister( char *reg ) {
 }
 
 /**
- *  Arrays
+ *  Arrays helpers
  */
 
+/* check if token is array */
 Bool isArray( char *arr ){
     int i;
     Bool flag = FALSE;
@@ -118,7 +122,6 @@ Bool isArray( char *arr ){
 }
 
 /* extract index from array tokens, ex: LIST[sz] => sz */
-
 char * getIndexFromToken( char *arrToken, char *result ){
     char * token = malloc(strlen(arrToken) + 1);
     int i = 0, j = 0;
@@ -144,7 +147,6 @@ char * getIndexFromToken( char *arrToken, char *result ){
 }
 
 /* extract label from array tokens, ex: LIST[sz] => LIST */
-
 char * getLabelFromToken( char *arrToken, char*result ){
     char * token = malloc(strlen(arrToken) + 1);
     int i = 0;
@@ -162,8 +164,7 @@ char * getLabelFromToken( char *arrToken, char*result ){
     return result;
 }
 
-/* print two's complement */
-
+/* get two's complement */
 int getTwosComplement(int num) { 
     unsigned long mask = 1; /* create mask */
     Bool flag = FALSE;
@@ -184,6 +185,7 @@ int getTwosComplement(int num) {
     return num;
 } 
 
+/* print short bin, was used as a helper function for developing, based on maman11 */
 void print_short_bin(unsigned short int x){
     unsigned int mask = 1 << ( WORD_SIZE - 1 );
 
@@ -197,11 +199,12 @@ void print_short_bin(unsigned short int x){
     }
 }
 
+/* decode binary to machine code */
 char * getBase4( word line ){
     unsigned int mask01 = 1; /* 1 in binary == ..00001 */
     unsigned int mask10 = 2; /* 2 in binary == ..00010 */
     char * result = malloc(WORD_SIZE/2 - 1); /* every 2 bits are 1, minus one because array index starts at 0 */
-    int i = WORD_SIZE/2 - 1;
+    int i = WORD_SIZE/2 - 1; /* we replace every 2 bits, so count down */
     
     if(!result) {
         printf("error allocated memeory"); /* DELETe */
@@ -235,9 +238,7 @@ char * getBase4( word line ){
 }
 
 
-/**
- * concat 2 strings
- */
+/* concat 2 strings */
 char* concat(char *s1, char *s2) {
     char *result = malloc(strlen(s1) + strlen(s2) + 1);
     strcpy(result, s1);
