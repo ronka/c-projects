@@ -4,15 +4,16 @@ Bool writeObjFile( MCptr  head, char * fileName ){
     char * fullFileName = concat(fileName, OBJECT_FILE_NAME);
     FILE *f = fopen(fullFileName, "w");
     MCptr p1 = head;
+    int i = MEMORY_START;
     
     if (f == NULL) {
-        printf("Error opening file!\n"); /* DELETE */
+        printf("Error opening file!\n");
         return FALSE;
     }
 
     while ( p1 != NULL ){
-        /* print some text */
-        fprintf(f, "%s\n", getBase4( p1->value ));
+        fprintf(f, "%04d %s\n", i, getBase4( p1->value ));
+        i++;
         p1 = p1->next;
     }
 
@@ -27,7 +28,7 @@ Bool writeDTFile( DTptr  head, char * fileName, char * suffix ){
     DTptr p1 = head;
     
     if (f == NULL) {
-        printf("Error opening file!\n"); /* DELETE */
+        printf("Error opening file!\n");
         return FALSE;
     }
 

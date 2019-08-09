@@ -10,7 +10,6 @@ Bool STaddNode(STptr * head, char * name, char * type, int value) {
     t = ( STptr ) malloc(sizeof(STnode));
 
     if( !t ){
-        /* TODO: PRINT ERROR */
         return FALSE;
     }
 
@@ -208,8 +207,8 @@ void MCreplaceNodeN( MCptr *head, word newValue, int n ){
 
     while( i < n ){
         if( curr == NULL || curr->next == NULL ){
-            printf("error finding node"); /* DELETE */
-            exit(1);
+            printf("error finding node");
+            return FALSE;
         }
         curr = curr->next;
         i++;

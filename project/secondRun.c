@@ -3,9 +3,9 @@
 void newMachineLine( word * );
 
 Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFile, char * fileName){
-    char *line = malloc(MAX_LINE);
-    char *tempStr = malloc(MAX_LINE);
-    char *token = malloc(MAX_LINE);
+    char *line = malloc(MAX_LINE); /* command line */
+    char *tempStr = malloc(MAX_LINE); /* temperery string */
+    char *token = malloc(MAX_LINE); /* token for strtok */
     int op, inst; /* var used to save operation and instraction */
     int DC = 0, lineCnt = 1; /* memory track */
     Bool regFlag, errorFlag = FALSE;
@@ -139,6 +139,7 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                     removeSpaces(token);
 
                     if( isRegister( token ) ){
+                        /* if its a register */
                         machineLine.cmd.srcOp = OPADDRESS_DIRECT_REG;
                         srcArg.reg.srcOperand = token[1] - '0'; /* if its a register, extract register number */
 
@@ -162,15 +163,15 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                             /* if a macro */
                             srcArg.num.value = getSTValue( *SymbolTable, token, MACRO );
                         } else{
-                            printf("%04d - invalid number",lineCnt); /* DELETE */
+                            printf("%04d - invalid number",lineCnt); 
                             lineCnt++;
                             errorFlag = TRUE;
                             continue;
                         }
 
                         if( ! MCaddNode( &tempMachineCode, srcArg ) ){
-                            printf("Failed to save machine code \n"); /* DELETE */
-                            exit(1);
+                            printf("Failed to save machine code \n"); 
+                            return FALSE;
                         }
 
                         DC++;
@@ -373,7 +374,7 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
                     DC++; /* increment DC for machine code line */
                     break;
                 default:
-                    printf("%04d not recognized op\n",lineCnt); /* DELETE */
+                    printf("%04d not recognized op\n",lineCnt); 
                     lineCnt++;
                     errorFlag = TRUE;
                     continue;
@@ -395,6 +396,8 @@ Bool secondRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entF
     if( errorFlag ){
         return FALSE;
     }
+
+    /* if no error, print files */
 
     writeObjFile( machineCode, fileName );
     

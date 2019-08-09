@@ -2,7 +2,6 @@
  * Datatable.h
  * Here are all the structs and types needed for:
  * Symbol Table + Data Table
- * 
  */
 
 /*

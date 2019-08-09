@@ -196,14 +196,14 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
         if( (op = isOp( token )) > -1 ){
             if( labelFlag ){
                 if( isInST(*SymbolTable, tempStr, DATA) ){
-                    printf("%04d - this label allready exists\n",lineCnt); /* DELETE */
+                    printf("%04d - this label allready exists\n",lineCnt);
                     lineCnt++;
                     errorFlag = TRUE;
                     continue;
                 }
 
                 if( ! STaddNode( SymbolTable, tempStr, DATA, DC ) ){
-                    printf("%04d - failed to add to symbol table\n",lineCnt); /* DELETE */
+                    printf("%04d - failed to add to symbol table\n",lineCnt);
                     lineCnt++;
                     errorFlag = TRUE;
                     continue;
@@ -254,7 +254,7 @@ Bool firstRun(FILE *sourceFile, STptr *SymbolTable, DTptr *extFile, DTptr *entFi
                     DC++;
                     break;
                 default:
-                    printf("%04d - not recognized op\n", lineCnt); /* DELETE */
+                    printf("%04d - not recognized op\n", lineCnt);
                     lineCnt++;
                     errorFlag = TRUE;
                     continue;
