@@ -201,7 +201,7 @@ Bool MCaddNode(MCptr * head, word value) {
     return TRUE;
 }
 
-void MCreplaceNodeN( MCptr *head, word newValue, int n ){
+Bool MCreplaceNodeN( MCptr *head, word newValue, int n ){
     MCptr curr = *head;
     int i = 0;
 
@@ -216,6 +216,7 @@ void MCreplaceNodeN( MCptr *head, word newValue, int n ){
 
     curr->value = newValue;
 
+    return TRUE;
 }
 
 void printMC( MCptr  head ){

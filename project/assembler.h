@@ -54,7 +54,7 @@ Bool STaddNode(STptr *, char *, char *, int);
 
 void printMC(MCptr);
 Bool MCaddNode(MCptr *, word);
-void MCreplaceNodeN(MCptr *, word, int);
+Bool MCreplaceNodeN(MCptr *, word, int);
 
 void freeST(STptr);
 void freeDT(DTptr);
